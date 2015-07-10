@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Puzzle v1.0</title>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+	<div class="main"></div>
+	<style>
+		.main
+		{
+			margin: 0 auto;
+			width: 500px;
+		}
+		table,tr 
+		{
+			border:1px solid red;
+		}
+		td
+		{
+			padding: 10px 15px;
+			border: 1px dashed salmon;
+		}
+		.borderbottom > td 
+		{
+			border-bottom: 2px solid red;
+		}
+		.borderleft
+		{
+			border-left: 2px solid red;
+		}
+	</style>
+	<script>
+		/******************************************************
+	    *	Author 			: 	Rohan Lopes
+	    *	Last Modified 	: 	10-July-2015 11:11 AM
+	    *******************************************************/
+
+	    $( document ).ready(function(){
+	    	fnSuDoKu();
+	    });
+
+		function getByClusterVals(arr){
+			try {
+				var arr_ret=[];
+				for (var k = 0; k < arr.length; k++) {
+					arr_ret.push(arr[k].Val);
+				}
+
+				return arr_ret;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function getByCluster(clusterid){
+			try {
+				var arr=[];
+				for (var k = 1; k <= 9; k++) {
+					for (var j = 1; j <= 9; j++) {
+					    if(objSuDoKuVals['rc'+k+''+j].Cluster==clusterid){
+					      arr.push(objSuDoKuVals['rc'+k+''+j]);
+					    }
+					}
+				}
+				return arr;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+		
+		function getVerticalHorizontal(id){
+			try {
+				var arrV = [];
+				var arrH = [];
+				for (var k = 1; k <= 9; k++) {
+					for (var j = 1; j <= 9; j++) {
+					    if(objSuDoKuVals['rc'+k+''+j].i==id.i){
+					      arrH.push(objSuDoKuVals['rc'+k+''+j]);
+					    }
+					    if(objSuDoKuVals['rc'+k+''+j].j==id.j){
+					      arrV.push(objSuDoKuVals['rc'+k+''+j]);
+					    }
+					}
+				}
+				return {'horizontal': arrH, 'vertical': arrV};
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function findNulls(clusterid){
+			try {
+				var count=0;
+				var cluster = getByCluster(clusterid);
+				for (var k = 0; k < getByCluster(clusterid).length; k++) {
+				    if(cluster[k].Val==null){
+				      count++;
+				    }
+				}
+				return count;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function checkHV(id, base_val) {
+			try {
+			    arrHV = getVerticalHorizontal(id);
+			    var flag = false;
+			    var testFlag = $.inArray(base_val, getByClusterVals(getByCluster(id.Cluster)))
+			    if(testFlag	== -1){
+				    for (i = 0; i < arrHV.horizontal.length; i++) {
+				      	if (arrHV.horizontal[i].Val == base_val || arrHV.vertical[i].Val == base_val) {
+				        	flag = true;
+				        	break;
+				      	}
+				    }
+			    } else {
+			      	flag = true;
+			    }
+			    return flag;
+			} catch (e) {
+			    console.error(e);
+			}
+		}
+
+		function getRemainVal(cluster){
+			try {
+				var testarr = getByCluster(cluster);
+				var valarr=[];
+				for (var k = 0; k <testarr.length; k++) {
+					if(testarr[k].Val == null){
+						console.log(testarr[k]);
+					}else{
+						valarr.push(testarr[k].Val);
+					}
+				}
+				return $(basearr).not(valarr).get();
+			} catch (e) {
+				console.error(e);
+			}
+		}
+		function genBlankObj() {
+			try {
+				for (var i=1;i<=9;i++) {
+					for (var j=1;j<=9;j++) {
+						if ( i < 4 && j < 4) {
+							cluster=1;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i<4 && j >=4 && j<7 ) {
+							cluster=2;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i < 4 && j >=7 ) {
+							cluster=3;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						}  else if (i >= 4 && j < 4 && i<7 ) {
+							cluster=4;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i>=4 && i<7 && j >=4 && j<7 ) {
+							cluster=5;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i >=4 && i<7 && j >=7) {
+							cluster=6;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i >=7 && j < 4) {
+							cluster=7;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i>=7 && j >=4 && j<7 ) {
+							cluster=8;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						} else if (i>=7 && j >=7) {
+							cluster=9;
+							objSuDoKuVals['rc'+i+''+j+''] = { i , j , 'Val' : '', 'Cluster': cluster};
+						}
+					}
+				}
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function fnSuDoKu() {
+			try {
+				objSuDoKuVals = {};
+				var cluster;
+				//generate 9 clusters
+				genBlankObj();
+				//generate temp values for 9 clusters
+				arr 	=	[1,1,1,1,1,1,1,1,1];
+				basearr	=	[];
+				for(var i=9; i>= 1; i--){
+					basearr.push(i);
+				}
+
+				for (var k = 1; k <= 9; k++) {
+				  	for (var j = 1; j <= 9; j++) {
+				  		for (var i = 0; i < basearr.length; i++) {
+				  			var test = basearr[i];
+			  				if(checkHV(objSuDoKuVals['rc'+k+''+j], test) == false) {
+			  					objSuDoKuVals['rc'+k+''+j].Val = test;
+			  					break;
+					     	}
+				  		}			  	
+				  	}
+				}
+
+				// rohan();
+				//let's paint it
+				rePaint();
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function rePaint(){
+			try {
+				displaytxt = "<table border=\"1\">";
+
+				for (var i=1;i<=9;i++) {
+					if(i==3 || i==6){
+						displaytxt += "<tr class='borderbottom'>";
+					} else {
+						displaytxt += "<tr>";
+					}
+					for (var j=1;j<=9;j++) {
+						if(j==4 || j==7){
+							displaytxt += "<td class='borderleft'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+						} else {
+							displaytxt += "<td>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+						}
+						
+					}
+					displaytxt += "</tr>";
+				}
+				displaytxt += "</table>";
+				$('.main').html(displaytxt);
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		function rohan(){
+			var rohan=[];
+			for (var k = 1; k <= 9; k++) {
+			  	for (var j = 1; j <= 9; j++) {
+			    	if (objSuDoKuVals['rc' + k + '' + j].Val == '') {
+			      		rohan.push(objSuDoKuVals['rc' + k + '' + j]);
+			    	}
+			  	}
+			}
+			
+		  	for (var m = 0; m < rohan.length; m++) {
+		  		for (var k = 0; k < basearr.length; k++) {
+		  			var test = basearr[k];
+	  				//console.log(test,rohan[m]);
+	  				if(checkHV(rohan[m], test) == false) {
+	  					objSuDoKuVals['rc'+rohan[m].i+''+rohan[m].j].Val = test;
+	  					break;
+			     	}
+		  		}			  	
+		  	}
+			
+			rePaint();
+			return rohan;
+		}
+	</script>
+</body>
+</html>
+
+
