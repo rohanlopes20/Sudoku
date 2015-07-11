@@ -38,8 +38,35 @@
 
 	    $( document ).ready(function(){
 	    	fnSuDoKu();
+	    	// wrote algorithm still some blank values :(
+	    	// below function should save me but decided to hang browser first lol :P
+	   		/*while(findNulls() == true) {
+	      		fnSuDoKu();
+			}*/
 	    });
 
+	    //find number of null values in the matrix
+	    function findNulls(){
+			try {
+				doThat = true;
+				var arrNull = [];
+				for (var k = 1; k <= 9; k++) {
+				  	for (var j = 1; j <= 9; j++) {
+				    	if (objSuDoKuVals['rc' + k + '' + j].Val == '') {
+				      		arrNull.push(objSuDoKuVals['rc' + k + '' + j]);
+				      		break;
+				    	}
+				  	}
+				}
+
+				doThat = (arrNull.length == 0) ? false : true;
+				return doThat;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		//get the array with values of given cluster
 		function getByClusterVals(arr){
 			try {
 				var arr_ret=[];
@@ -53,6 +80,7 @@
 			}
 		}
 
+		//get the object of given cluster
 		function getByCluster(clusterid){
 			try {
 				var arr=[];
@@ -69,6 +97,7 @@
 			}
 		}
 		
+		//get Horizontal and vertical values of given value
 		function getVerticalHorizontal(id){
 			try {
 				var arrV = [];
@@ -89,21 +118,7 @@
 			}
 		}
 
-		function findNulls(clusterid){
-			try {
-				var count=0;
-				var cluster = getByCluster(clusterid);
-				for (var k = 0; k < getByCluster(clusterid).length; k++) {
-				    if(cluster[k].Val==null){
-				      count++;
-				    }
-				}
-				return count;
-			} catch (e) {
-				console.error(e);
-			}
-		}
-
+		//check if given value is already present its horizontal/verrtical direction
 		function checkHV(id, base_val) {
 			try {
 			    arrHV = getVerticalHorizontal(id);
@@ -125,6 +140,7 @@
 			}
 		}
 
+		//get remaining values array of perticular cluster
 		function getRemainVal(cluster){
 			try {
 				var testarr = getByCluster(cluster);
@@ -141,6 +157,8 @@
 				console.error(e);
 			}
 		}
+
+		//generate blank object for sudoku
 		function genBlankObj() {
 			try {
 				for (var i=1;i<=9;i++) {
@@ -180,6 +198,7 @@
 			}
 		}
 
+		//main sudoku algorithm 
 		function fnSuDoKu() {
 			try {
 				objSuDoKuVals = {};
@@ -187,16 +206,19 @@
 				//generate 9 clusters
 				genBlankObj();
 				//generate temp values for 9 clusters
-				arr 	=	[1,1,1,1,1,1,1,1,1];
 				basearr	=	[];
-				for(var i=9; i>= 1; i--){
+				/*for(var i=9; i>= 1; i--){*/
+				for(var i=1; i<=9; i++){
 					basearr.push(i);
 				}
 
+				loopCount = 0;
 				for (var k = 1; k <= 9; k++) {
 				  	for (var j = 1; j <= 9; j++) {
 				  		for (var i = 0; i < basearr.length; i++) {
 				  			var test = basearr[i];
+				  				test = Math.floor(Math.random() * 9) + 1;
+				  				loopCount++;
 			  				if(checkHV(objSuDoKuVals['rc'+k+''+j], test) == false) {
 			  					objSuDoKuVals['rc'+k+''+j].Val = test;
 			  					break;
@@ -213,6 +235,8 @@
 			}
 		}
 
+
+		//paint function
 		function rePaint(){
 			try {
 				displaytxt = "<table border=\"1\">";
@@ -225,9 +249,9 @@
 					}
 					for (var j=1;j<=9;j++) {
 						if(j==4 || j==7){
-							displaytxt += "<td class='borderleft'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+							displaytxt += "<td class='borderleft' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
 						} else {
-							displaytxt += "<td>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+							displaytxt += "<td data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
 						}
 						
 					}
@@ -240,7 +264,9 @@
 			}
 		}
 
-		function rohan(){
+
+		//and this function was to saave me but it didnt lol
+		function rohan() {
 			var rohan=[];
 			for (var k = 1; k <= 9; k++) {
 			  	for (var j = 1; j <= 9; j++) {
@@ -267,5 +293,3 @@
 	</script>
 </body>
 </html>
-
-
