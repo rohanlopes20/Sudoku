@@ -5,12 +5,66 @@
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 </head>
 <body>
-	<div class="main"></div>
+	<div class="wrapper">
+		<div class="title">Sudoku Game</div>
+		<div class="wrap">
+			<div class="left">
+				<div>
+					Easy 	<input name="gamelevel" type="radio" value="easy"><br />
+					Medium 	<input name="gamelevel" type="radio" value="medium"><br />
+					Hard 	<input name="gamelevel" type="radio" value="hard"><br />
+				</div>
+				<div>
+					<br /><br />
+					Score : <span id="score"></span>
+					<br /><br />
+					Remaining Values : <span id="remain"></span>
+				</div>
+			</div>
+			
+			<div class="right main"></div>
+		</div>
+	</div>
 	<style>
-		.main
+		.wrap
+		{
+			margin: 50px 0;
+		}
+		input[type="radio"]
+		{
+			float: right;
+			margin-right: 130px; 
+		}
+		input[type="text"]
+		{
+			width: 30px;
+			height: 30px;
+			border: none;
+			margin: 4px;
+			text-align: center;
+		}
+		.title
+		{
+			text-align: center;
+			font-size: 30px;
+			font-weight: 600;
+			font-family: cursive;
+			display: none;
+		}
+		.left
+		{
+			width: 30%;
+			float: left;
+		}
+		.right
+		{
+			width: 70%;
+			float: right;
+		}
+		.wrapper
 		{
 			margin: 0 auto;
-			width: 500px;
+			width:700px;
 		}
 		table,tr 
 		{
@@ -18,8 +72,11 @@
 		}
 		td
 		{
-			padding: 10px 15px;
 			border: 1px dashed salmon;
+		}
+		.pad
+		{
+			padding: 10px 15px;
 		}
 		.borderbottom > td 
 		{
@@ -36,13 +93,21 @@
 	    *	Last Modified 	: 	10-July-2015 11:11 AM
 	    *******************************************************/
 
+	    var level 	= 1;
+    	objSolution = {} || objSolution;
 	    $( document ).ready(function(){
 	    	fnSuDoKu();
+	    	
 	    	// wrote algorithm still some blank values :(
 	    	// below function should save me but decided to hang browser first lol :P
 	   		/*while(findNulls() == true) {
 	      		fnSuDoKu();
 			}*/
+
+			$('input').keypress(function (e) {
+				//console.log(e.key);
+				checkSolution(e.key);
+			});
 	    });
 
 	    //find number of null values in the matrix
@@ -213,17 +278,21 @@
 				}
 
 				loopCount = 0;
+				var basearr_min = 0;
+				var basearr_max = 9;
 				for (var k = 1; k <= 9; k++) {
 				  	for (var j = 1; j <= 9; j++) {
-				  		for (var i = 0; i < basearr.length; i++) {
+				  		for (var i = basearr_min; i < basearr_max; i++) {
 				  			var test = basearr[i];
-				  				test = Math.floor(Math.random() * 9) + 1;
+				  				//test = Math.floor(Math.random() * 9) + 1;
+				  			basearr_min = basearr.indexOf(test);
 				  				loopCount++;
 			  				if(checkHV(objSuDoKuVals['rc'+k+''+j], test) == false) {
 			  					objSuDoKuVals['rc'+k+''+j].Val = test;
 			  					break;
 					     	}
-				  		}			  	
+				  		}
+				  		basearr_min = (j == 9 || basearr_min == 8) ? 0 : basearr_min;	  	
 				  	}
 				}
 
@@ -235,23 +304,75 @@
 			}
 		}
 
+		function checkSolution(key) {
+			try {
 
+				var val1 = $('input:focus').parent().attr('row-col');
+				var val2 = $('input:focus').parent().attr('data-sudoku-val');
+				var val3 = val1.split("|");
+				var val4 = $('input:focus').val() || key;
+
+				console.log('1',key,'t', val2);
+		    	if ( val4 == val2) {
+		    		objSolution['rc' + val3[0] + '' + val3[1]].Val = key;
+		      		console.log(true);
+		    	}
+				
+				var cnt = 0;
+				for (var k = 1; k <= 9; k++) {
+				  	for (var j = 1; j <= 9; j++) {
+				    	if (objSolution['rc' + k + '' + j].Val == objSuDoKuVals['rc' + k + '' + j].Val) {
+				    		cnt++;
+				      		//break;
+				    	}
+				  	}
+				}
+
+				if(cnt == 81) {
+					console.log('Sudoku is solved!!');
+					$('#score').html('100');
+				} else if(cnt < 75 && cnt > 65) {
+					$('#score').html(cnt);
+				} else if(cnt < 65 && cnt > 55) {
+					$('#score').html(cnt);
+				} else if(cnt < 55 && cnt > 30) {
+					$('#score').html(cnt);
+				} else {
+					$('#score').html(cnt);
+				}
+
+			} catch (e) {
+				console.error(e);
+			}
+		}
 		//paint function
 		function rePaint(){
 			try {
-				displaytxt = "<table border=\"1\">";
+				objSolution = $.extend(true, {}, objSuDoKuVals);
+				displaytxt 	= "<table border=\"1\">";
 
 				for (var i=1;i<=9;i++) {
-					if(i==3 || i==6){
+					if(i==3 || i==6) {
 						displaytxt += "<tr class='borderbottom'>";
 					} else {
 						displaytxt += "<tr>";
 					}
 					for (var j=1;j<=9;j++) {
-						if(j==4 || j==7){
-							displaytxt += "<td class='borderleft' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+						blank_val = Math.floor(Math.random() * 9) + 1;
+						if(j == 4 || j == 7) {
+							if(blank_val == 4) {
+								displaytxt += "<td class='borderleft' row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'><input type=\"text\" data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'/></td>";
+								objSolution['rc'+i+''+j].Val = "";
+							} else {
+								displaytxt += "<td class='borderleft pad' row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+							}
 						} else {
-							displaytxt += "<td data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+							if(blank_val == 4) {
+								displaytxt += "<td row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'><input type=\"text\" data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'/></td>";
+								objSolution['rc'+i+''+j].Val = "";
+							} else {
+								displaytxt += "<td class=\"pad\" row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
+							}
 						}
 						
 					}
