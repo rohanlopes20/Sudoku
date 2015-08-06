@@ -10,15 +10,15 @@
 		<div class="wrap">
 			<div class="left">
 				<div>
-					Easy 	<input name="gamelevel" type="radio" value="easy"><br />
-					Medium 	<input name="gamelevel" type="radio" value="medium"><br />
-					Hard 	<input name="gamelevel" type="radio" value="hard"><br />
+					Easy 	<input onclick="fnChangeLevel(1);" name="gamelevel" type="radio" value="easy"><br />
+					Medium 	<input onclick="fnChangeLevel(2);" name="gamelevel" type="radio" value="medium"><br />
+					Hard 	<input onclick="fnChangeLevel(3);" name="gamelevel" type="radio" value="hard"><br />
 				</div>
 				<div>
 					<br /><br />
 					Score : <span id="score"></span>
 					<br /><br />
-					Remaining Values : <span id="remain"></span>
+					<!-- Remaining Values : <span id="remain"></span> -->
 				</div>
 			</div>
 			
@@ -49,7 +49,7 @@
 			font-size: 30px;
 			font-weight: 600;
 			font-family: cursive;
-			display: none;
+			/*display: none;*/
 		}
 		.left
 		{
@@ -93,23 +93,49 @@
 	    *	Last Modified 	: 	10-July-2015 11:11 AM
 	    *******************************************************/
 
-	    var level 	= 1;
+	    var gameLevel = 12;
     	objSolution = {} || objSolution;
-	    $( document ).ready(function(){
-	    	fnSuDoKu();
-	    	
+
+	    $( document ).ready(function() {
+	    	$('#score').html('0');
+	    	$('input[value=easy]').click();
 	    	// wrote algorithm still some blank values :(
 	    	// below function should save me but decided to hang browser first lol :P
 	   		/*while(findNulls() == true) {
 	      		fnSuDoKu();
 			}*/
 
-			$('input').keypress(function (e) {
-				//console.log(e.key);
+			$('input').keydown(function (e) {
+				console.log(e.key);
 				checkSolution(e.key);
 			});
 	    });
 
+	    function fnChangeLevel(level){
+	    	try {
+	    		switch(level) {
+	    			case 1 :
+	    				gameLevel = 20;
+	    				fnSuDoKu();
+	    				break;
+	    			case 2 :
+	    				gameLevel = 15;
+	    				fnSuDoKu();
+	    				break;
+	    			case 3 :
+	    				gameLevel = 12;
+	    				fnSuDoKu();
+	    				break;
+	    			default:
+	    				gameLevel = 12;
+	    				fnSuDoKu();
+	    				break;
+
+	    		}
+	    	} catch (e) {
+	    		console.error(e);
+	    	}
+	    }
 	    //find number of null values in the matrix
 	    function findNulls(){
 			try {
@@ -350,6 +376,7 @@
 			try {
 				objSolution = $.extend(true, {}, objSuDoKuVals);
 				displaytxt 	= "<table border=\"1\">";
+				var arrNum = [1, 2, 3, 4, 5, 6, 7 ,8 , 9];
 
 				for (var i=1;i<=9;i++) {
 					if(i==3 || i==6) {
@@ -358,16 +385,16 @@
 						displaytxt += "<tr>";
 					}
 					for (var j=1;j<=9;j++) {
-						blank_val = Math.floor(Math.random() * 9) + 1;
-						if(j == 4 || j == 7) {
-							if(blank_val == 4) {
+						blank_val = Math.floor(Math.random() * gameLevel) + 1;
+						if(j == 4 || j == 7) { //for border burpose
+							if($.inArray(blank_val, arrNum) != -1) {
 								displaytxt += "<td class='borderleft' row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'><input type=\"text\" data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'/></td>";
 								objSolution['rc'+i+''+j].Val = "";
 							} else {
 								displaytxt += "<td class='borderleft pad' row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'>" + objSuDoKuVals['rc'+i+''+j].Val + "</td>";
 							}
 						} else {
-							if(blank_val == 4) {
+							if($.inArray(blank_val, arrNum) != -1) {
 								displaytxt += "<td row-col='"+ objSuDoKuVals['rc'+i+''+j].i+"|"+objSuDoKuVals['rc'+i+''+j].j+ "' data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'><input type=\"text\" data-sudoku-val='"+ objSuDoKuVals['rc'+i+''+j].Val+"'/></td>";
 								objSolution['rc'+i+''+j].Val = "";
 							} else {
