@@ -18,6 +18,7 @@
 					<br /><br />
 					Score : <span id="score"></span>
 					<br /><br />
+					<span id="over">Game Over</span>
 					<!-- Remaining Values : <span id="remain"></span> -->
 				</div>
 			</div>
@@ -437,6 +438,35 @@
 			
 			rePaint();
 			return rohan;
+		}
+		
+		function fnShuffle() {
+			try{
+				objSuDoKuValsNew = $.extend(true, {}, objSuDoKuVals);
+
+				//row shift
+
+				for (var k = 1; k <= 3; k++) {
+					for (var j = 1; j <= 9; j++) {
+						objSuDoKuValsNew['rc' + (k+6) + '' + j].Val = objSuDoKuVals['rc' + k + '' + j].Val;
+						objSuDoKuValsNew['rc' + k + '' + j].Val = objSuDoKuVals['rc' + (k+6) + '' + j].Val;
+					}
+				}
+
+				//column shift
+				for (var k = 1; k <= 9; k++) {
+					for (var j = 1; j <= 3; j++) {
+						objSuDoKuValsNew['rc' + k + '' + (j+6)].Val = objSuDoKuVals['rc' + k + '' + j].Val;
+						objSuDoKuValsNew['rc' + k + '' + j].Val = objSuDoKuVals['rc' + k + '' + (j+6)].Val;
+					}
+				}
+				
+				objSuDoKuVals=objSuDoKuValsNew;
+				rePaint();
+				
+			} catch(e){
+				console.error(e);
+			}
 		}
 	</script>
 </body>
